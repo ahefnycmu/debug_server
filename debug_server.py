@@ -19,7 +19,7 @@ through the methods connect_to_server, send_data and check_point.
 
 Checkpoint pass criteria can be changed by reimplementing _check_data function.
 The curretn implementation assumes numerical or numpy array values and tests
-them for equality.
+them for equality.up to error tolerance specified by --tol option.
 
 See _demo_client for an example of using the debug server.
 To test this script run these processes in seperate terminals:
@@ -125,7 +125,7 @@ def _accept_connetions(args):
     ssock.close()
     return connection, client_address
 
-def _check_data(lbl0, lbl1, data0, data1):
+def _check_data(lbl0, lbl1, data0, data1, args):
     if lbl0 != lbl1:
         print >> sys.stderr, 'Checkpoint label mismatch'
         return False
@@ -149,21 +149,21 @@ def _check_data(lbl0, lbl1, data0, data1):
         chk_pass = False
         
     for k in (s0&s1):
-        v0 = data0[k]
-        v1 = data1[k]
-        
-        match = True
-                        
-        if isinstance(v0, np.ndarray):
-            if v0.shape != v1.shape or not np.all(v0 == v1):
-                match = False
-        elif v0 != v1:
-            match = False
+        v0 = np.array(data0[k])
+        v1 = np.array(data1[k])
+                            
+        if v0.shape != v1.shape: 
+            print >> sys.stderr, 'Shape mismatch for key %s' % k
+            chk_pass = False     
+        else:
+            diff = np.max(np.abs(v0-v1))
             
-        if not match:
-            print >> sys.stderr, 'Value mismatch for key %s' % k
-            chk_pass = False
-        
+            if diff > args.tol:
+                print >> sys.stderr, 'ERROR: Value mismatch for key %s exceeds threshold (max error = %e)' % (k, diff)
+                chk_pass = False    
+            elif diff > 0.0:
+                print >> sys.stderr, 'WARNING: Non-zero value difference for key %s (max error = %e)' % (k, diff)            
+                                        
     return chk_pass
 
 def _run_server(args):        
@@ -184,7 +184,7 @@ def _run_server(args):
                     lbl[i] = msg[0]
                     data[i] = msg[1]
             
-        chk = _check_data(lbl[0], lbl[1], data[0], data[1])    
+        chk = _check_data(lbl[0], lbl[1], data[0], data[1], args)    
         print >> sys.stderr, 'Checkpoint passed' if chk else 'Checkpoint failed'
         
         if chk:
@@ -200,7 +200,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--server_ip', type=str, default=default_ip)
     parser.add_argument('--port', type=int, default=default_port)
-    parser.add_argument('--client', type=bool, default=False)
+    parser.add_argument('--client', type=bool, default=False, help='If true, runs a demo client')
+    parser.add_argument('--tol', type=bool, default=0.0, help='Error tolerance')
               
     args = parser.parse_args()
     

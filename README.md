@@ -22,8 +22,8 @@ To test this script run these processes in seperate terminals:
    
 ```
 python debug_test.py 
-python debug_test.py --client True
-python debug_test.py --client True
+python debug_test.py --client
+python debug_test.py --client
 ```
 This results in the following output
 ![alt text](https://github.com/ahefnycmu/debug_server/blob/master/screenshot.png "Demo output")

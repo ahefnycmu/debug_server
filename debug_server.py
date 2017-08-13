@@ -25,8 +25,8 @@ See _demo_client for an example of using the debug server.
 To test this script run these processes in seperate terminals:
     
 python debug_test.py 
-python debug_test.py --client True
-python debug_test.py --client True
+python debug_test.py --client
+python debug_test.py --client
 '''
 
 import numpy as np
@@ -108,11 +108,14 @@ def _demo_client(args):
     send_data('d', d)                    # Same key, different values
     check_point('step_2')    
        
-def _accept_connetions(args):    
+def _accept_connetions(args):        
     ssock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print >> sys.stderr, 'Starting debug server on port %d' % args.port
+
+    if args.reuse:
+        ssock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
     ssock.bind((args.server_ip, args.port))
-    
+    print >> sys.stderr, 'Starting debug server on port %d' % args.port    
     ssock.listen(1)
         
     connection = [None] * num_clients
@@ -200,7 +203,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--server_ip', type=str, default=default_ip)
     parser.add_argument('--port', type=int, default=default_port)
-    parser.add_argument('--client', dest='client',  action='store_true', help='runs a demo client')
+    parser.add_argument('--client', action='store_true', help='Runs a demo client')
+    parser.add_argument('--reuse', action='store_true', help='Sets SO_REUSEADDR socket option.')
     parser.add_argument('--tol', type=float, default=0.0, help='Error tolerance')
               
     args = parser.parse_args()

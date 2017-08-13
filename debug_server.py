@@ -201,7 +201,7 @@ if __name__ == '__main__':
     parser.add_argument('--server_ip', type=str, default=default_ip)
     parser.add_argument('--port', type=int, default=default_port)
     parser.add_argument('--client', type=bool, default=False, help='If true, runs a demo client')
-    parser.add_argument('--tol', type=bool, default=0.0, help='Error tolerance')
+    parser.add_argument('--tol', type=float, default=0.0, help='Error tolerance')
               
     args = parser.parse_args()
     

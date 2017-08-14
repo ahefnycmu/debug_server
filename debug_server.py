@@ -81,12 +81,13 @@ def check_point(label):
     reply = sock.recv(1, socket.MSG_WAITALL)
     
     if reply == ACK:
-        print >> sys.stderr, 'pass'
-        local_data.clear()
+        print >> sys.stderr, 'pass'        
     else:
         remote_data = _recv_msg(sock)
         print >> sys.stderr, 'fail'
         import pdb; pdb.set_trace()
+
+    local_data.clear()
 
 def _demo_client(args):
     connect_to_server(args.server_ip, args.port)

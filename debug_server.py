@@ -39,7 +39,6 @@ from argparse import ArgumentParser
 
 sock = None
 local_data = {}
-num_clients = 2
 ACK = b'0'
 ERR = b'1'
 
@@ -109,7 +108,8 @@ def _demo_client(args):
     send_data('d', d)                    # Same key, different values
     check_point('step_2')    
        
-def _accept_connetions(args):        
+def _accept_connetions(args): 
+    num_clients = 1 if args.single else 2       
     ssock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     if args.reuse:
@@ -171,6 +171,7 @@ def _check_data(lbl0, lbl1, data0, data1, args):
     return chk_pass
 
 def _run_server(args):        
+    num_clients = 1 if args.single else 2
     connection, client_address = _accept_connetions(args)    
     
     while True:
@@ -188,12 +189,11 @@ def _run_server(args):
                     lbl[i] = msg[0]
                     data[i] = msg[1]
             
-        chk = _check_data(lbl[0], lbl[1], data[0], data[1], args)    
+        chk = True if args.single else _check_data(lbl[0], lbl[1], data[0], data[1], args)    
         print >> sys.stderr, 'Checkpoint passed' if chk else 'Checkpoint failed'
         
         if chk:
-            connection[0].send(ACK)
-            connection[1].send(ACK)
+            for c in connection: c.send(ACK)            
         else:
             connection[0].send(ERR)
             _send_msg(connection[0], data[1])
@@ -205,10 +205,11 @@ if __name__ == '__main__':
     parser.add_argument('--server_ip', type=str, default=default_ip)
     parser.add_argument('--port', type=int, default=default_port)
     parser.add_argument('--client', action='store_true', help='Runs a demo client')
-    parser.add_argument('--reuse', action='store_true', help='Sets SO_REUSEADDR socket option.')
+    parser.add_argument('--reuse', action='store_true', help='Sets SO_REUSEADDR socket option.')    
     parser.add_argument('--tol', type=float, default=0.0, help='Error tolerance')
+    parser.add_argument('--single', action='store_true', help='Accepts a single client. No comparisons are made.')
               
-    args = parser.parse_args()
+    args = parser.parse_args()        
     
     if args.client:
         _demo_client(args)

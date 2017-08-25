@@ -29,10 +29,13 @@ This results in the following output
 ![alt text](https://github.com/ahefnycmu/debug_server/blob/master/screenshot.png "Demo output")
 
 # Additional Parameters
---server_ip: Specifies server ip [default 127.0.0.1]
+--server_ip: Specifies server ip [default 127.0.0.1].
 
---port: Specifies server port [default 6666]
+--port: Specifies server port [default 6666].
 
---tol: Specifies error tolerance (measure in max absolute difference a.k.a $L_\infty$ error norm) [default 0.0]
+--tol: Specifies error tolerance (measure in max absolute difference a.k.a $L_\infty$ error norm) [default 0.0].
 
+--reuse: Sets SO_REUSEADDR socket option.
+
+--single': Accepts a single client. No comparisons are made.
 

@@ -1,8 +1,8 @@
 # debug_server
-A utility to run two python programs in sync and checking whether two programs produce identical numerical outputs.
+A utility to run two python programs in sync and check whether they produce identical numerical outputs.
 
 The checked programs act as clients to the debug server.
-Program executation is divided into check-point. In check point, the clients 
+Program executation is divided into check-points. In each check point, the clients 
 send name/value pairs (string/numpy array) to the server and the server ensures
 they are identical otherwise both clients start the debugger. In this case, 
 Checkpoint data can be examined through local_data variable. Data sent by the other program
@@ -12,8 +12,8 @@ The server is started by running this script. Clients interact with the server
 through the methods connect_to_server, send_data and check_point.
 
 Checkpoint pass criteria can be changed by reimplementing _check_data function.
-The curretn implementation assumes numerical or numpy array values and tests
-them for equality.
+The current implementation assumes numerical or numpy array values and tests
+them for (approximate) equality.
 
 See _demo_client for an example of using the debug server.
 
@@ -33,9 +33,9 @@ This results in the following output
 
 --port: Specifies server port [default 6666].
 
---tol: Specifies error tolerance (measure in max absolute difference a.k.a $L_\infty$ error norm) [default 0.0].
+--tol: Specifies error tolerance (measured in max absolute difference a.k.a $L_\infty$ error norm) [default 0.0].
 
 --reuse: Sets SO_REUSEADDR socket option.
 
---single': Accepts a single client. No comparisons are made.
+--single: Accepts a single client. No comparisons are made.
 
